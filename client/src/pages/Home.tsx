@@ -1,31 +1,176 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
-import { Streamdown } from 'streamdown';
+import { 
+  Calculator, 
+  FileText, 
+  MessageSquare, 
+  BookOpen, 
+  DollarSign, 
+  Calendar,
+  FlaskConical,
+  Search,
+  ArrowRight
+} from "lucide-react";
+import { Link } from "wouter";
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Workflow, Frontend Best Practices, Design Guide and Common Pitfalls
- */
 export default function Home() {
-  // The userAuth hooks provides authentication state
-  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
-  let { user, loading, error, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
+  const features = [
+    {
+      icon: Calculator,
+      title: "Sample Size Calculator",
+      description: "Calculate required sample sizes for multiple statistical tests including t-tests, ANOVA, chi-square, and more with power curve visualizations.",
+      href: "/tools/sample-size"
+    },
+    {
+      icon: FlaskConical,
+      title: "Study Type Wizard",
+      description: "Interactive decision tree to help you select the appropriate study design for your research question.",
+      href: "/tools/study-wizard"
+    },
+    {
+      icon: FileText,
+      title: "AI Proposal Writer",
+      description: "Generate and refine research proposals with AI assistance, IMRAD templates, and export to PDF/Word.",
+      href: "/tools/proposal-writer"
+    },
+    {
+      icon: MessageSquare,
+      title: "Research Assistant Chat",
+      description: "Ask questions about methodology, statistics, and study design. Get context-aware guidance from our AI assistant.",
+      href: "/tools/chat"
+    },
+    {
+      icon: FlaskConical,
+      title: "Statistical Test Selector",
+      description: "Interactive flowchart to help you choose the right statistical test based on your data type and research question.",
+      href: "/tools/test-selector"
+    },
+    {
+      icon: Search,
+      title: "Literature Search",
+      description: "Search PubMed for relevant research papers and save them to your projects with AI-generated summaries.",
+      href: "/tools/literature"
+    },
+    {
+      icon: DollarSign,
+      title: "Budget Calculator",
+      description: "Estimate research costs based on sample size, study design, and resource requirements.",
+      href: "/tools/budget"
+    },
+    {
+      icon: Calendar,
+      title: "Timeline Planner",
+      description: "Create and visualize your research timeline with milestones for each phase of your study.",
+      href: "/tools/timeline"
+    }
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-primary/5 to-background">
+        <div className="container py-16 md:py-24">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Medical Research Assistant
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8">
+              A comprehensive platform for academic and clinical researchers to plan, design, and write research proposals with AI-powered assistance.
+            </p>
+            {isAuthenticated ? (
+              <div className="flex gap-4 justify-center">
+                <Link href="/projects">
+                  <Button size="lg">
+                    View Projects
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/tools/chat">
+                  <Button size="lg" variant="outline">
+                    Start Chat
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <Button size="lg" asChild>
+                <a href={getLoginUrl()}>
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Features Grid */}
+      <div className="container py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Comprehensive Research Tools</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Everything you need to design, plan, and execute your research project from start to finish.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <Icon className="h-10 w-10 text-primary mb-2" />
+                  <CardTitle className="text-lg">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="mb-4">
+                    {feature.description}
+                  </CardDescription>
+                  {isAuthenticated ? (
+                    <Link href={feature.href}>
+                      <Button variant="ghost" size="sm" className="w-full">
+                        Open Tool
+                        <ArrowRight className="ml-2 h-3 w-3" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button variant="ghost" size="sm" className="w-full" asChild>
+                      <a href={getLoginUrl()}>
+                        Login to Access
+                      </a>
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-primary/5 py-16">
+        <div className="container">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to Start Your Research Journey?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Join researchers worldwide using our platform to design better studies and write compelling proposals.
+            </p>
+            {!isAuthenticated && (
+              <Button size="lg" asChild>
+                <a href={getLoginUrl()}>
+                  Create Free Account
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
