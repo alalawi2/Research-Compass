@@ -5,6 +5,8 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import AdminFeedback from "./pages/AdminFeedback";
+import { FeedbackButton } from "./components/FeedbackButton";
 import Projects from "./pages/Projects";
 import SampleSizeCalculator from "./pages/SampleSizeCalculator";
 import StudyWizard from "./pages/StudyWizard";
@@ -18,8 +20,9 @@ import TimelinePlanner from "./pages/TimelinePlanner";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path="/projects" component={Projects} />
+         <Route path={"/"} component={Home} />
+      <Route path={"/admin/feedback"} component={AdminFeedback} />
+      <Route path={"/404"} component={NotFound} />
       <Route path="/tools/sample-size" component={SampleSizeCalculator} />
       <Route path="/tools/study-wizard" component={StudyWizard} />
       <Route path="/tools/proposal-writer" component={ProposalWriter} />
@@ -37,10 +40,14 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider
+        defaultTheme="light"
+        // switchable
+      >
         <TooltipProvider>
           <Toaster />
           <Router />
+          <FeedbackButton />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

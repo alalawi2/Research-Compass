@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -575,6 +576,16 @@ export const appRouter = router({
       .query(async ({ ctx }) => {
         const { getUserFeedback } = await import('./db');
         return getUserFeedback(ctx.user.id);
+      }),
+
+    getAll: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Only admins can view all feedback
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const { getAllFeedback } = await import('./db');
+        return getAllFeedback();
       }),
   }),
 });

@@ -358,7 +358,23 @@ export async function getAllFeedback() {
   const db = await getDb();
   if (!db) return [];
   
-  return await db.select().from(feedback).orderBy(feedback.createdAt);
+  const result = await db
+    .select({
+      id: feedback.id,
+      userId: feedback.userId,
+      type: feedback.type,
+      subject: feedback.subject,
+      message: feedback.message,
+      status: feedback.status,
+      createdAt: feedback.createdAt,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(feedback)
+    .leftJoin(users, eq(feedback.userId, users.id))
+    .orderBy(feedback.createdAt);
+  
+  return result;
 }
 
 

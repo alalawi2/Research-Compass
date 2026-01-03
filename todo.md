@@ -308,3 +308,47 @@ All major features completed and tested:
 - [x] Find and fix nested <a> tags in Home page
 - [x] Ensure Link components don't wrap other anchor elements
 - [x] Test all navigation links after fix
+
+
+---
+
+## Trial Phase: Feedback & Rating System
+
+### Phase 1: Feedback UI Component
+- [x] Create feedback dialog component with star rating (1-5)
+- [x] Add feedback categories (Bug Report, Feature Request, General Feedback)
+- [x] Add text area for detailed feedback
+- [x] Add subject field for feedback summary
+- [x] Implement star rating component
+- [x] Add submit button with loading state
+- [x] Show success message after submission
+- [x] Send email notification to Dr.Abdullahalalawi@gmail.com
+
+### Phase 2: Admin Feedback Dashboard
+- [x] Create admin-only feedback dashboard page
+- [x] Display all feedback submissions in table format
+- [x] Show user information (name, email)
+- [x] Show rating with star visualization
+- [x] Add export feedback to CSV feature
+- [ ] Add filters by category and rating
+- [ ] Add date range filter
+- [ ] Add ability to mark feedback as resolved
+
+### Phase 3: Feedback Button Integration
+- [x] Add floating feedback button to all pages
+- [x] Position button in bottom-right corner
+- [x] Make button accessible and visible
+- [x] Add tooltip "Send Feedback"
+- [x] Test feedback submission flow
+- [x] Write and run vitest tests (18/18 passing)
+- [x] Verify email notifications work
+
+### Phase 4: Main Website Integration
+- [x] Provide integration instructions for main website (INTEGRATION_GUIDE.md)
+- [x] Document 3 integration options (direct link, iframe, custom domain)
+- [x] Create HTML code snippets for resources page
+- [x] Document branding customization
+- [x] Explain authentication flow
+- [x] Create testing checklist
+- [ ] Add CORS configuration (if iframe embedding chosen)
+- [ ] Test iframe embedding on main website (if chosen)
