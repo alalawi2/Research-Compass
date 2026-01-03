@@ -248,3 +248,63 @@ All major features completed and tested:
 - [x] Ensure calculation works for all wizard paths
 - [x] Fix any empty result issues (fixed Step 3 for categorical, Step 2 for correlation/survival)
 - [x] Add error handling for edge cases
+
+
+---
+
+## Commercial Platform Enhancements
+
+### Phase 1: Stripe Payment Integration
+- [ ] Add Stripe feature using webdev_add_feature
+- [ ] Configure Stripe API keys and webhook endpoints
+- [ ] Create subscription plans (Free, Basic $19/mo, Pro $49/mo)
+- [ ] Design pricing page with plan comparison
+- [ ] Implement subscription checkout flow
+- [ ] Build billing dashboard for users
+- [ ] Add subscription management (upgrade/downgrade/cancel)
+- [ ] Implement payment method management
+- [ ] Add invoice history view
+- [ ] Test payment flows end-to-end
+
+### Phase 2: Feature Gating & Access Control
+- [ ] Extend user schema with subscription tier field
+- [ ] Implement feature access middleware
+- [ ] Gate AI features (proposal writer, chat) for Pro tier
+- [ ] Limit calculations per month for Free tier (10/month)
+- [ ] Limit project saves for Basic tier (5 projects)
+- [ ] Add upgrade prompts when limits reached
+- [ ] Create feature comparison matrix
+- [ ] Test all access control scenarios
+
+### Phase 3: User Onboarding Flow
+- [ ] Design onboarding wizard UI component
+- [ ] Create welcome screen for new users
+- [ ] Build interactive tutorial for sample size calculator
+- [ ] Add guided tour for beginner wizard
+- [ ] Create tutorial for AI proposal writer
+- [ ] Add tutorial for research chat assistant
+- [ ] Implement progress tracking for onboarding
+- [ ] Add skip/complete onboarding options
+- [ ] Store onboarding completion status in database
+- [ ] Test onboarding flow for new users
+
+### Phase 4: Analytics Dashboard
+- [ ] Extend database schema for analytics tracking
+- [ ] Create analytics events table (tool_usage, calculations, sessions)
+- [ ] Implement event tracking middleware
+- [ ] Build admin analytics dashboard UI
+- [ ] Add charts for tool usage statistics
+- [ ] Add charts for calculation type distribution
+- [ ] Track user session duration
+- [ ] Track feature adoption rates
+- [ ] Add user growth metrics
+- [ ] Add revenue metrics (MRR, churn rate)
+- [ ] Implement date range filters
+- [ ] Add export analytics data feature
+- [ ] Test analytics tracking accuracy
+
+
+## Bug Fix: Nested Anchor Tags
+- [x] Find and fix nested <a> tags in Home page
+- [x] Ensure Link components don't wrap other anchor elements
+- [x] Test all navigation links after fix

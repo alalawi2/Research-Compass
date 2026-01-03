@@ -160,12 +160,12 @@ export default function Home() {
                     {feature.description}
                   </CardDescription>
                   {isAuthenticated ? (
-                    <Link href={feature.href}>
-                      <Button variant="ghost" size="sm" className="w-full">
+                    <Button variant="ghost" size="sm" className="w-full" asChild>
+                      <Link href={feature.href}>
                         Open Tool
                         <ArrowRight className="ml-2 h-3 w-3" />
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   ) : (
                     <Button variant="ghost" size="sm" className="w-full" asChild>
                       <a href={getLoginUrl()}>
