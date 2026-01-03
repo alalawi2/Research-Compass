@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Calendar, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { Calendar, Download, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { exportTimelineToPDF } from "@/lib/exportPDF";
+import { GanttChart } from "@/components/GanttChart";
 
 interface Milestone {
   name: string;
@@ -387,8 +389,26 @@ export default function TimelinePlanner() {
               </CardContent>
             </Card>
 
-            {/* Save Button */}
-            <div className="flex justify-end">
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2">
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => {
+                  const project = projects?.find(p => p.id === selectedProjectId);
+                  exportTimelineToPDF({
+                    projectTitle: project?.title || 'Research Project',
+                    projectStartDate: projectStartDate,
+                    projectEndDate: projectEndDate,
+                    milestones: milestones.filter(m => m.name && m.startDate && m.endDate),
+                  });
+                  toast.success('Timeline exported to PDF');
+                }}
+                disabled={!selectedProjectId || milestones.length === 0}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export PDF
+              </Button>
               <Button
                 size="lg"
                 onClick={handleSave}
@@ -407,6 +427,17 @@ export default function TimelinePlanner() {
                 )}
               </Button>
             </div>
+
+            {/* Gantt Chart Visualization */}
+            {milestones.length > 0 && milestones.some(m => m.name && m.startDate && m.endDate) && (
+              <div className="mt-6">
+                <GanttChart
+                  milestones={milestones.filter(m => m.name && m.startDate && m.endDate)}
+                  projectStartDate={projectStartDate}
+                  projectEndDate={projectEndDate}
+                />
+              </div>
+            )}
           </>
         )}
       </div>

@@ -9,9 +9,13 @@ import { trpc } from "@/lib/trpc";
 import { Calculator, Loader2, Save } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PowerCurveChart } from "@/components/PowerCurveChart";
+import { SampleSizeWizard } from "@/components/SampleSizeWizard";
+import { Badge } from "@/components/ui/badge";
 
 export default function SampleSizeCalculator() {
   const { isAuthenticated } = useAuth();
+  const [wizardMode, setWizardMode] = useState(false);
   const [testType, setTestType] = useState<string>("ttest-independent");
   const [alpha, setAlpha] = useState("0.05");
   const [power, setPower] = useState("0.80");
@@ -68,14 +72,66 @@ export default function SampleSizeCalculator() {
     { value: "log-rank", label: "Log-Rank Test (Survival)" },
   ];
 
-  return (
-    <div className="min-h-screen bg-background">
+  const handleWizardComplete = (params: any) => {
+    setTestType(params.testType);
+    setAlpha(params.alpha);
+    setPower(params.power);
+    setEffectSize(params.effectSize);
+    if (params.numGroups) setNumGroups(params.numGroups);
+    if (params.df) setDf(params.df);
+    if (params.ratio) setRatio(params.ratio);
+    if (params.rho) setRho(params.rho);
+    if (params.hazardRatio) setHazardRatio(params.hazardRatio);
+    if (params.eventProbability) setEventProbability(params.eventProbability);
+    setWizardMode(false);
+    
+    // Automatically calculate
+    calculateMutation.mutate({
+      testType: params.testType,
+      alpha: parseFloat(params.alpha),
+      power: parseFloat(params.power),
+      effectSize: parseFloat(params.effectSize),
+      numGroups: params.numGroups ? parseInt(params.numGroups) : undefined,
+      df: params.df ? parseInt(params.df) : undefined,
+      ratio: params.ratio ? parseFloat(params.ratio) : undefined,
+      rho: params.rho ? parseFloat(params.rho) : undefined,
+      hazardRatio: params.hazardRatio ? parseFloat(params.hazardRatio) : undefined,
+      eventProbability: params.eventProbability ? parseFloat(params.eventProbability) : undefined,
+    });
+  };
+
+  if (wizardMode) {
+    return (
       <div className="container py-8">
+        <SampleSizeWizard
+          onComplete={handleWizardComplete}
+          onCancel={() => setWizardMode(false)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container py-8">
+      <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Sample Size Calculator</h1>
-          <p className="text-muted-foreground">
-            Calculate required sample sizes for various statistical tests
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Sample Size Calculator</h1>
+              <p className="text-muted-foreground">
+                Calculate the required sample size for your research study using various statistical tests.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setWizardMode(true)}
+              className="flex items-center gap-2"
+            >
+              <Badge variant="secondary" className="mr-2">New</Badge>
+              Beginner Mode
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -350,6 +406,18 @@ export default function SampleSizeCalculator() {
             </Card>
           </div>
         </div>
+
+        {/* Power Curve Visualization */}
+        {calculateMutation.data && (
+          <div className="mt-6">
+            <PowerCurveChart
+              testType={testTypes.find(t => t.value === testType)?.label || testType}
+              alpha={parseFloat(alpha)}
+              effectSize={parseFloat(effectSize)}
+              calculatedSampleSize={calculateMutation.data.sampleSize}
+            />
+          </div>
+        )}
 
         {/* Information Tabs */}
         <Card className="mt-6">

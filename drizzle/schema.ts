@@ -181,3 +181,67 @@ export const feedback = mysqlTable("feedback", {
 
 export type Feedback = typeof feedback.$inferSelect;
 export type InsertFeedback = typeof feedback.$inferInsert;
+
+/**
+ * Project Collaborators table - stores project sharing and permissions
+ */
+export const projectCollaborators = mysqlTable("project_collaborators", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("project_id").notNull(),
+  userId: int("user_id").notNull(),
+  role: mysqlEnum("role", ["owner", "editor", "viewer"]).default("viewer").notNull(),
+  invitedBy: int("invited_by").notNull(),
+  invitedAt: timestamp("invited_at").defaultNow().notNull(),
+  acceptedAt: timestamp("accepted_at"),
+});
+
+export type ProjectCollaborator = typeof projectCollaborators.$inferSelect;
+export type InsertProjectCollaborator = typeof projectCollaborators.$inferInsert;
+
+/**
+ * Proposal Comments table - stores comments on proposal sections
+ */
+export const proposalComments = mysqlTable("proposal_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  proposalId: int("proposal_id").notNull(),
+  userId: int("user_id").notNull(),
+  section: varchar("section", { length: 100 }),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProposalComment = typeof proposalComments.$inferSelect;
+export type InsertProposalComment = typeof proposalComments.$inferInsert;
+
+/**
+ * Proposal Revisions table - stores version history of proposals
+ */
+export const proposalRevisions = mysqlTable("proposal_revisions", {
+  id: int("id").autoincrement().primaryKey(),
+  proposalId: int("proposal_id").notNull(),
+  userId: int("user_id").notNull(),
+  version: int("version").notNull(),
+  content: text("content").notNull(),
+  changeDescription: text("change_description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ProposalRevision = typeof proposalRevisions.$inferSelect;
+export type InsertProposalRevision = typeof proposalRevisions.$inferInsert;
+
+/**
+ * Project Activity Feed table - stores activity log for projects
+ */
+export const projectActivities = mysqlTable("project_activities", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("project_id").notNull(),
+  userId: int("user_id").notNull(),
+  activityType: varchar("activity_type", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ProjectActivity = typeof projectActivities.$inferSelect;
+export type InsertProjectActivity = typeof projectActivities.$inferInsert;

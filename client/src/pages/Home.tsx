@@ -14,9 +14,10 @@ import {
   ArrowRight
 } from "lucide-react";
 import { Link } from "wouter";
+import { Loader2 } from "lucide-react";
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading, logout } = useAuth();
 
   const features = [
     {
@@ -71,6 +72,35 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navigation Header */}
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container flex h-16 items-center justify-between">
+          <Link href="/">
+            <a className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <h2 className="text-xl font-bold">Medical Research Assistant</h2>
+            </a>
+          </Link>
+          
+          <div className="flex items-center gap-4">
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isAuthenticated ? (
+              <>
+                <span className="text-sm text-muted-foreground hidden sm:inline">Welcome, {user?.name || 'User'}</span>
+                <Link href="/projects">
+                  <Button variant="ghost">My Projects</Button>
+                </Link>
+                <Button variant="outline" onClick={() => logout()}>Sign Out</Button>
+              </>
+            ) : (
+              <Button asChild>
+                <a href={getLoginUrl()}>Sign In</a>
+              </Button>
+            )}
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="bg-gradient-to-b from-primary/5 to-background">
         <div className="container py-16 md:py-24">

@@ -185,3 +185,54 @@ All major features completed and tested:
 ✅ Project Management (CRUD operations)
 ✅ User Authentication (Manus OAuth)
 ✅ Comprehensive Testing (12 vitest tests passing)
+
+
+---
+
+## New Enhancement Phase - Export, Visualizations & Collaboration
+
+### Phase 1: PDF/Word Export Functionality
+- [x] Install document generation libraries (jsPDF, docx)
+- [x] Create PDF export for proposals with IMRAD formatting
+- [x] Create Word export for proposals
+- [x] Add PDF export for budget calculator with tables
+- [x] Add PDF export for timeline with milestones
+- [x] Add export buttons to UI for each tool
+- [ ] Test all export formats
+
+### Phase 2: Interactive Visualizations
+- [x] Install charting library (recharts already available)
+- [x] Add power curve visualization to sample size calculator
+- [x] Create interactive Gantt chart for timeline planner
+- [x] Add budget breakdown pie/bar charts
+- [ ] Add visual comparison charts for different study designs
+- [x] Make all charts responsive and interactive
+- [ ] Test visualizations on different screen sizes
+
+### Phase 3: Collaboration Features
+- [ ] Extend database schema for project sharing and comments
+- [ ] Create project sharing functionality (invite by email)
+- [ ] Add permission levels (owner, editor, viewer)
+- [ ] Implement comment system for proposals
+- [ ] Add revision tracking for proposals
+- [ ] Create activity feed for project changes
+- [ ] Add real-time notifications for collaborators
+- [ ] Build collaboration UI components
+- [ ] Test sharing and permission workflows
+
+
+## User Feedback: Sample Size Calculator Improvements
+- [x] Create step-by-step wizard for sample size calculator
+- [x] Add beginner-friendly questions to guide test selection
+- [x] Explain each parameter in plain language
+- [x] Provide examples and recommendations for each input
+- [x] Show progress through the wizard steps
+- [x] Add educational tooltips and help text
+- [ ] Test wizard with beginner users
+
+
+## User Feedback: Authentication UI
+- [x] Add visible sign-in button to landing page header
+- [x] Add user profile menu when logged in
+- [x] Show authentication status clearly
+- [x] Add logout button in header

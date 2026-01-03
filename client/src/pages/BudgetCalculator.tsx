@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { DollarSign, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { DollarSign, Download, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { exportBudgetToPDF } from "@/lib/exportPDF";
+import { BudgetChart } from "@/components/BudgetChart";
 
 interface BudgetCategory {
   name: string;
@@ -265,8 +267,29 @@ export default function BudgetCalculator() {
               </CardContent>
             </Card>
 
-            {/* Save Button */}
-            <div className="flex justify-end">
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2">
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => {
+                  const project = projects?.find(p => p.id === selectedProjectId);
+                  exportBudgetToPDF({
+                    projectTitle: project?.title || 'Research Project',
+                    categories: categories.map(cat => ({
+                      category: cat.name,
+                      amount: cat.amount,
+                      description: '',
+                    })),
+                    totalBudget: categories.reduce((sum, cat) => sum + cat.amount, 0),
+                  });
+                  toast.success('Budget exported to PDF');
+                }}
+                disabled={!selectedProjectId || categories.length === 0}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export PDF
+              </Button>
               <Button
                 size="lg"
                 onClick={handleSave}
@@ -285,6 +308,16 @@ export default function BudgetCalculator() {
                 )}
               </Button>
             </div>
+
+            {/* Budget Visualization */}
+            {categories.length > 0 && categories.some(c => c.amount > 0) && (
+              <div className="mt-6">
+                <BudgetChart
+                  categories={categories.filter(c => c.amount > 0)}
+                  totalBudget={categories.reduce((sum, cat) => sum + cat.amount, 0)}
+                />
+              </div>
+            )}
           </>
         )}
       </div>

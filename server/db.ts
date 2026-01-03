@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
-  users, 
+  users,
   projects, 
   InsertProject,
   sampleSizeCalculations,
@@ -20,7 +20,15 @@ import {
   savedPapers,
   InsertSavedPaper,
   feedback,
-  InsertFeedback
+  InsertFeedback,
+  projectCollaborators,
+  InsertProjectCollaborator,
+  proposalComments,
+  InsertProposalComment,
+  proposalRevisions,
+  InsertProposalRevision,
+  projectActivities,
+  InsertProjectActivity,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -351,4 +359,79 @@ export async function getAllFeedback() {
   if (!db) return [];
   
   return await db.select().from(feedback).orderBy(feedback.createdAt);
+}
+
+
+// Collaboration queries
+export async function addProjectCollaborator(data: InsertProjectCollaborator) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.insert(projectCollaborators).values(data);
+}
+
+export async function getProjectCollaborators(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(projectCollaborators)
+    .where(eq(projectCollaborators.projectId, projectId));
+}
+
+export async function removeProjectCollaborator(collaboratorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.delete(projectCollaborators)
+    .where(eq(projectCollaborators.id, collaboratorId));
+}
+
+export async function addProposalComment(data: InsertProposalComment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(proposalComments).values(data);
+  return Number((result as any).insertId);
+}
+
+export async function getProposalComments(proposalId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(proposalComments)
+    .where(eq(proposalComments.proposalId, proposalId))
+    .orderBy(proposalComments.createdAt);
+}
+
+export async function addProposalRevision(data: InsertProposalRevision) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.insert(proposalRevisions).values(data);
+}
+
+export async function getProposalRevisions(proposalId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(proposalRevisions)
+    .where(eq(proposalRevisions.proposalId, proposalId))
+    .orderBy(proposalRevisions.version);
+}
+
+export async function addProjectActivity(data: InsertProjectActivity) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.insert(projectActivities).values(data);
+}
+
+export async function getProjectActivities(projectId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(projectActivities)
+    .where(eq(projectActivities.projectId, projectId))
+    .orderBy(projectActivities.createdAt)
+    .limit(limit);
 }

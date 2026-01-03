@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { FileText, Loader2, Save, Sparkles, Wand2 } from "lucide-react";
+import { Download, FileText, Loader2, Save, Sparkles, Wand2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
+import { exportProposalToPDF } from "@/lib/exportPDF";
+import { exportProposalToWord } from "@/lib/exportWord";
 
 export default function ProposalWriter() {
   const { isAuthenticated } = useAuth();
@@ -206,6 +208,44 @@ export default function ProposalWriter() {
             <Button variant="outline">
               <Save className="mr-2 h-4 w-4" />
               Save Draft
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                exportProposalToPDF({
+                  title: 'Research Proposal',
+                  sections: [
+                    { title: 'Introduction', content: introduction },
+                    { title: 'Methods', content: methods },
+                    { title: 'Results', content: results },
+                    { title: 'Discussion', content: discussion },
+                    { title: 'References', content: references },
+                  ],
+                });
+                toast.success('PDF exported successfully');
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export PDF
+            </Button>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                await exportProposalToWord({
+                  title: 'Research Proposal',
+                  sections: [
+                    { title: 'Introduction', content: introduction },
+                    { title: 'Methods', content: methods },
+                    { title: 'Results', content: results },
+                    { title: 'Discussion', content: discussion },
+                    { title: 'References', content: references },
+                  ],
+                });
+                toast.success('Word document exported successfully');
+              }}
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Export Word
             </Button>
           </div>
         </div>

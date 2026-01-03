@@ -15,6 +15,13 @@
       "when": 1767379571629,
       "tag": "0001_round_kid_colt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1767445421701,
+      "tag": "0002_big_blob",
+      "breakpoints": true
     }
   ]
 }
