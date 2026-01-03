@@ -16,13 +16,14 @@ import TestSelector from "./pages/TestSelector";
 import LiteratureSearch from "./pages/LiteratureSearch";
 import BudgetCalculator from "./pages/BudgetCalculator";
 import TimelinePlanner from "./pages/TimelinePlanner";
-
+import ResearchWorkflow from "./pages/ResearchWorkflow";
 function Router() {
   return (
     <Switch>
-         <Route path={"/"} component={Home} />
+      <Route path={"/"} component={Home} />
+      <Route path="/projects" component={Projects} />
+      <Route path="/research-workflow" component={ResearchWorkflow} />
       <Route path={"/admin/feedback"} component={AdminFeedback} />
-      <Route path={"/404"} component={NotFound} />
       <Route path="/tools/sample-size" component={SampleSizeCalculator} />
       <Route path="/tools/study-wizard" component={StudyWizard} />
       <Route path="/tools/proposal-writer" component={ProposalWriter} />
@@ -40,10 +41,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
           <Router />

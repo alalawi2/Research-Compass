@@ -76,17 +76,21 @@ export const appRouter = router({
           'mann-whitney',
           'wilcoxon',
           'correlation',
-          'log-rank'
+          'log-rank',
+          'cross-sectional'
         ]),
         alpha: z.number().min(0.001).max(0.5),
-        power: z.number().min(0.5).max(0.999),
-        effectSize: z.number().positive(),
+        power: z.number().min(0.5).max(0.999).optional(),
+        effectSize: z.number().positive().optional(),
         numGroups: z.number().int().positive().optional(),
         df: z.number().int().positive().optional(),
         ratio: z.number().positive().optional(),
         rho: z.number().min(-1).max(1).optional(),
         hazardRatio: z.number().positive().optional(),
         eventProbability: z.number().min(0).max(1).optional(),
+        prevalence: z.number().min(0).max(1).optional(),
+        marginOfError: z.number().min(0).max(1).optional(),
+        populationSize: z.number().int().positive().optional(),
       }))
       .mutation(async ({ input }) => {
         const stats = await import('../shared/statistics');
@@ -95,55 +99,63 @@ export const appRouter = router({
           case 'ttest-independent':
             return stats.calculateTTestIndependent({
               alpha: input.alpha,
-              power: input.power,
-              effectSize: input.effectSize,
+              power: input.power!,
+              effectSize: input.effectSize!,
               ratio: input.ratio,
             });
           case 'ttest-paired':
             return stats.calculateTTestPaired({
               alpha: input.alpha,
-              power: input.power,
-              effectSize: input.effectSize,
+              power: input.power!,
+              effectSize: input.effectSize!,
             });
           case 'anova':
             return stats.calculateANOVA({
               alpha: input.alpha,
-              power: input.power,
-              effectSize: input.effectSize,
+              power: input.power!,
+              effectSize: input.effectSize!,
               numGroups: input.numGroups || 2,
             });
           case 'chi-square':
             return stats.calculateChiSquare({
               alpha: input.alpha,
-              power: input.power,
-              effectSize: input.effectSize,
+              power: input.power!,
+              effectSize: input.effectSize!,
               df: input.df || 1,
             });
           case 'mann-whitney':
             return stats.calculateMannWhitney({
               alpha: input.alpha,
-              power: input.power,
-              effectSize: input.effectSize,
+              power: input.power!,
+              effectSize: input.effectSize!,
               ratio: input.ratio,
             });
           case 'wilcoxon':
             return stats.calculateWilcoxon({
               alpha: input.alpha,
-              power: input.power,
-              effectSize: input.effectSize,
+              power: input.power!,
+              effectSize: input.effectSize!,
             });
           case 'correlation':
             return stats.calculateCorrelation({
               alpha: input.alpha,
-              power: input.power,
+              power: input.power!,
               rho: input.rho || 0.3,
             });
           case 'log-rank':
             return stats.calculateLogRank({
               alpha: input.alpha,
-              power: input.power,
+              power: input.power!,
               hazardRatio: input.hazardRatio || 2,
               eventProbability: input.eventProbability || 0.5,
+            });
+          case 'cross-sectional':
+            return stats.calculateCrossSectional({
+              alpha: input.alpha,
+              power: input.power,
+              prevalence: input.prevalence || 0.5,
+              marginOfError: input.marginOfError || 0.05,
+              populationSize: input.populationSize,
             });
           default:
             throw new Error('Invalid test type');
@@ -395,6 +407,33 @@ export const appRouter = router({
           const summaryResponse = await axios.get(summaryUrl, { params: summaryParams });
           const results = summaryResponse.data.result;
 
+          // Fetch abstracts using efetch
+          const fetchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi`;
+          const fetchParams = {
+            db: 'pubmed',
+            id: idList.join(','),
+            retmode: 'xml',
+            rettype: 'abstract'
+          };
+
+          const fetchResponse = await axios.get(fetchUrl, { params: fetchParams });
+          const xml = fetchResponse.data;
+          
+          // Parse abstracts from XML (simple regex-based extraction)
+          const abstracts: Record<string, string> = {};
+          idList.forEach((id: string) => {
+            const pmidMatch = new RegExp(`<PMID[^>]*>${id}</PMID>([\\s\\S]*?)<\\/PubmedArticle>`, 'i');
+            const articleMatch = xml.match(pmidMatch);
+            if (articleMatch) {
+              const abstractMatch = articleMatch[1].match(/<AbstractText[^>]*>([^<]+)<\/AbstractText>/gi);
+              if (abstractMatch) {
+                abstracts[id] = abstractMatch
+                  .map((text: string) => text.replace(/<[^>]+>/g, '').trim())
+                  .join(' ');
+              }
+            }
+          });
+
           const papers = idList.map((id: string) => {
             const paper = results[id];
             if (!paper) return null;
@@ -406,7 +445,8 @@ export const appRouter = router({
               journal: paper.fulljournalname || paper.source || 'Unknown journal',
               year: paper.pubdate?.split(' ')[0] || 'Unknown',
               doi: paper.elocationid || '',
-              url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`
+              url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`,
+              abstract: abstracts[id] || ''
             };
           }).filter(Boolean);
 
@@ -586,6 +626,75 @@ export const appRouter = router({
         }
         const { getAllFeedback } = await import('./db');
         return getAllFeedback();
+      }),
+  }),
+
+  workflow: router({
+    // Get workflow by ID or create new one
+    get: protectedProcedure
+      .input(z.object({ 
+        id: z.number().optional(),
+        projectId: z.number().optional()
+      }))
+      .query(async ({ ctx, input }) => {
+        // For now, return a default workflow state
+        // TODO: Implement database storage
+        return {
+          id: input.id,
+          userId: ctx.user.id,
+          projectId: input.projectId,
+          currentPhase: 1,
+          completedPhases: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+      }),
+
+    // Save/update workflow state
+    save: protectedProcedure
+      .input(z.object({
+        id: z.number().optional(),
+        projectId: z.number().optional(),
+        currentPhase: z.number(),
+        completedPhases: z.array(z.number()),
+        researchQuestion: z.any().optional(),
+        exploratoryReview: z.any().optional(),
+        systematicReview: z.any().optional(),
+        literatureSynthesis: z.any().optional(),
+        rationale: z.any().optional(),
+        studyDesign: z.any().optional(),
+        sampleSize: z.any().optional(),
+        statisticalPlan: z.any().optional(),
+        methods: z.any().optional(),
+        timelineEthics: z.any().optional(),
+        proposal: z.any().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // For now, just return the input with timestamps
+        // TODO: Implement database storage
+        return {
+          ...input,
+          id: input.id || Math.floor(Math.random() * 1000000),
+          userId: ctx.user.id,
+          updatedAt: new Date().toISOString(),
+          createdAt: input.id ? undefined : new Date().toISOString(),
+        };
+      }),
+
+    // List all workflows for user
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        // For now, return empty array
+        // TODO: Implement database storage
+        return [];
+      }),
+
+    // Delete workflow
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // TODO: Implement database deletion
+        return { success: true };
       }),
   }),
 });

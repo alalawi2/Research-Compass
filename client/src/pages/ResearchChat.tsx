@@ -160,11 +160,11 @@ export default function ResearchChat() {
                         }`}
                       >
                         {msg.role === "assistant" ? (
-                          <div className="prose prose-sm max-w-none dark:prose-invert">
+                          <div className="prose prose-sm dark:prose-invert break-words overflow-hidden">
                             <Streamdown>{msg.content}</Streamdown>
                           </div>
                         ) : (
-                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
                         )}
                       </div>
 

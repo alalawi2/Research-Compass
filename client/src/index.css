@@ -174,4 +174,28 @@
       max-width: 1280px; /* Standard content width */
     }
   }
+
+  /* Fix prose overflow in chat messages */
+  .prose {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .prose pre {
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .prose code {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

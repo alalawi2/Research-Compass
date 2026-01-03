@@ -26,6 +26,9 @@ export default function SampleSizeCalculator() {
   const [rho, setRho] = useState("0.3");
   const [hazardRatio, setHazardRatio] = useState("2");
   const [eventProbability, setEventProbability] = useState("0.5");
+  const [prevalence, setPrevalence] = useState("0.5");
+  const [marginOfError, setMarginOfError] = useState("0.05");
+  const [populationSize, setPopulationSize] = useState("");
 
   const calculateMutation = trpc.sampleSize.calculate.useMutation({
     onError: (error) => {
@@ -57,6 +60,15 @@ export default function SampleSizeCalculator() {
       params.hazardRatio = parseFloat(hazardRatio);
       params.eventProbability = parseFloat(eventProbability);
     }
+    if (testType === "cross-sectional") {
+      params.prevalence = parseFloat(prevalence);
+      params.marginOfError = parseFloat(marginOfError);
+      if (populationSize) {
+        params.populationSize = parseInt(populationSize);
+      }
+      delete params.power; // Not used in cross-sectional
+      delete params.effectSize; // Not used in cross-sectional
+    }
 
     calculateMutation.mutate(params);
   };
@@ -70,6 +82,7 @@ export default function SampleSizeCalculator() {
     { value: "wilcoxon", label: "Wilcoxon Signed-Rank Test" },
     { value: "correlation", label: "Correlation Test" },
     { value: "log-rank", label: "Log-Rank Test (Survival)" },
+    { value: "cross-sectional", label: "Cross-Sectional Study (Prevalence)" },
   ];
 
   const handleWizardComplete = (params: any) => {
@@ -198,7 +211,7 @@ export default function SampleSizeCalculator() {
                 </div>
 
                 {/* Effect Size */}
-                {testType !== "correlation" && (
+                {testType !== "correlation" && testType !== "cross-sectional" && (
                   <div className="space-y-2">
                     <Label htmlFor="effectSize">Effect Size (Cohen's d or w)</Label>
                     <Input
@@ -301,6 +314,55 @@ export default function SampleSizeCalculator() {
                         value={eventProbability}
                         onChange={(e) => setEventProbability(e.target.value)}
                       />
+                    </div>
+                  </div>
+                )}
+
+                {testType === "cross-sectional" && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="prevalence">Expected Prevalence</Label>
+                      <Input
+                        id="prevalence"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="1"
+                        value={prevalence}
+                        onChange={(e) => setPrevalence(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Proportion between 0 and 1 (e.g., 0.5 = 50%)
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="marginOfError">Margin of Error</Label>
+                      <Input
+                        id="marginOfError"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="1"
+                        value={marginOfError}
+                        onChange={(e) => setMarginOfError(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Desired precision (e.g., 0.05 = ±5%)
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="populationSize">Population Size (optional)</Label>
+                      <Input
+                        id="populationSize"
+                        type="number"
+                        min="1"
+                        placeholder="Leave empty for infinite population"
+                        value={populationSize}
+                        onChange={(e) => setPopulationSize(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        For finite populations (e.g., specific hospital, city)
+                      </p>
                     </div>
                   </div>
                 )}

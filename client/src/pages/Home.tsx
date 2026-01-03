@@ -11,7 +11,8 @@ import {
   Calendar,
   FlaskConical,
   Search,
-  ArrowRight
+  ArrowRight,
+  Workflow
 } from "lucide-react";
 import { Link } from "wouter";
 import { Loader2 } from "lucide-react";
@@ -20,6 +21,13 @@ export default function Home() {
   const { user, isAuthenticated, loading, logout } = useAuth();
 
   const features = [
+    {
+      icon: Workflow,
+      title: "Research Workflow",
+      description: "NEW! Guided end-to-end journey from research question to final proposal with integrated literature synthesis and auto-generated sections.",
+      href: "/research-workflow",
+      featured: true
+    },
     {
       icon: Calculator,
       title: "Sample Size Calculator",
@@ -113,15 +121,15 @@ export default function Home() {
             </p>
             {isAuthenticated ? (
               <div className="flex gap-4 justify-center">
-                <Link href="/projects">
+                <Link href="/research-workflow">
                   <Button size="lg">
-                    View Projects
+                    Start Workflow
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/tools/chat">
+                <Link href="/projects">
                   <Button size="lg" variant="outline">
-                    Start Chat
+                    View Projects
                   </Button>
                 </Link>
               </div>
@@ -150,9 +158,12 @@ export default function Home() {
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+              <Card key={index} className={`hover:shadow-lg transition-shadow ${feature.featured ? 'border-primary border-2' : ''}`}>
                 <CardHeader>
                   <Icon className="h-10 w-10 text-primary mb-2" />
+                  {feature.featured && (
+                    <span className="text-xs font-semibold text-primary mb-1">★ FEATURED</span>
+                  )}
                   <CardTitle className="text-lg">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>

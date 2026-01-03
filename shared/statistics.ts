@@ -286,6 +286,45 @@ export function calculateLogRank(params: {
 }
 
 /**
+ * Cross-sectional study sample size calculation (for prevalence/proportion)
+ */
+export function calculateCrossSectional(params: {
+  alpha: number;
+  power?: number;
+  prevalence: number; // expected prevalence/proportion (0-1)
+  marginOfError: number; // desired margin of error (0-1)
+  populationSize?: number; // finite population correction (optional)
+}): SampleSizeResult {
+  const { alpha, prevalence, marginOfError, populationSize } = params;
+  
+  const zAlpha = normalQuantile(1 - alpha / 2);
+  
+  // Sample size for infinite population
+  const p = prevalence;
+  const e = marginOfError;
+  const n = (zAlpha ** 2 * p * (1 - p)) / (e ** 2);
+  
+  // Apply finite population correction if population size is provided
+  let adjustedN = n;
+  if (populationSize && populationSize > 0) {
+    adjustedN = n / (1 + (n - 1) / populationSize);
+  }
+  
+  const confidenceLevel = (1 - alpha) * 100;
+  const notes = populationSize 
+    ? `${confidenceLevel}% CI, ±${(marginOfError * 100).toFixed(1)}% margin of error. Population: ${populationSize.toLocaleString()}`
+    : `${confidenceLevel}% CI, ±${(marginOfError * 100).toFixed(1)}% margin of error (infinite population)`;
+  
+  return {
+    sampleSize: Math.ceil(adjustedN),
+    power: params.power || 0.80,
+    alpha,
+    effectSize: prevalence,
+    notes
+  };
+}
+
+/**
  * Generate power curve data for visualization
  */
 export function generatePowerCurve(params: {
