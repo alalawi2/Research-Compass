@@ -97,6 +97,22 @@ export function SampleSizeWizard({ onComplete, onCancel }: WizardProps) {
   };
 
   const handleNext = () => {
+    // For correlation or survival: skip steps 2-4, go directly to step 5
+    if (step === 1 && (researchType === "correlation" || researchType === "survival")) {
+      const determined = determineTestType();
+      setTestType(determined);
+      setStep(5); // Skip steps 2-4, go directly to step 5 (parameters)
+      return;
+    }
+    
+    // For categorical data: skip step 4 (paired/distribution questions)
+    if (step === 3 && dataType === "categorical") {
+      const determined = determineTestType();
+      setTestType(determined);
+      setStep(5); // Skip step 4, go directly to step 5 (parameters)
+      return;
+    }
+    
     if (step === 4) {
       const determined = determineTestType();
       setTestType(determined);
@@ -105,6 +121,17 @@ export function SampleSizeWizard({ onComplete, onCancel }: WizardProps) {
   };
 
   const handleBack = () => {
+    // For correlation or survival: skip steps 2-4 when going back
+    if (step === 5 && (researchType === "correlation" || researchType === "survival")) {
+      setStep(1); // Skip steps 2-4, go directly back to step 1
+      return;
+    }
+    
+    // For categorical data: skip step 4 when going back
+    if (step === 5 && dataType === "categorical") {
+      setStep(3); // Skip step 4, go directly back to step 3
+      return;
+    }
     setStep(step - 1);
   };
 
@@ -241,7 +268,7 @@ export function SampleSizeWizard({ onComplete, onCancel }: WizardProps) {
           </div>
         )}
 
-        {/* Step 3: Number of Groups */}
+        {/* Step 3: Number of Groups (Continuous Data) */}
         {step === 3 && researchType === "comparison" && dataType === "continuous" && (
           <div className="space-y-6">
             <div>
@@ -267,6 +294,37 @@ export function SampleSizeWizard({ onComplete, onCancel }: WizardProps) {
                   </Label>
                 </div>
               </RadioGroup>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Categorical Data - Skip directly to test recommendation */}
+        {step === 3 && researchType === "comparison" && dataType === "categorical" && (
+          <div className="space-y-6">
+            <div className="p-6 bg-primary/10 rounded-lg border-2 border-primary">
+              <h3 className="text-lg font-semibold mb-2">Chi-Square Test Selected</h3>
+              <p className="text-muted-foreground">
+                For categorical data comparisons, we'll use the Chi-Square test. This test is appropriate for comparing proportions or frequencies between groups.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="chi-df">
+                  Degrees of Freedom
+                  <HelpTooltip content="For a 2x2 table (two groups, two outcomes), df = 1. For larger tables, df = (rows-1) × (columns-1)" />
+                </Label>
+                <Select value={chiSquareDf} onValueChange={setChiSquareDf}>
+                  <SelectTrigger id="chi-df">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 (2x2 table)</SelectItem>
+                    <SelectItem value="2">2</SelectItem>
+                    <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="4">4</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         )}
@@ -576,7 +634,8 @@ export function SampleSizeWizard({ onComplete, onCancel }: WizardProps) {
                 disabled={
                   (step === 1 && !researchType) ||
                   (step === 2 && !dataType && researchType === "comparison") ||
-                  (step === 3 && !numGroups) ||
+                  (step === 3 && dataType === "continuous" && !numGroups) ||
+                  (step === 3 && dataType === "categorical" && !chiSquareDf) ||
                   (step === 4 && (!pairedData || !normalDistribution)) ||
                   (step === 5 && !testType)
                 }

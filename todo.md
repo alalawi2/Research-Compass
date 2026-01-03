@@ -236,3 +236,15 @@ All major features completed and tested:
 - [x] Add user profile menu when logged in
 - [x] Show authentication status clearly
 - [x] Add logout button in header
+
+
+## Bug Fix: Sample Size Calculator Wizard
+- [x] Test all wizard scenarios (comparison/correlation/survival paths)
+- [x] Test continuous vs categorical data paths
+- [x] Test 2 groups vs multiple groups paths
+- [x] Test paired vs unpaired data paths
+- [x] Test normal vs non-normal distribution paths
+- [x] Verify all test recommendations are correct
+- [x] Ensure calculation works for all wizard paths
+- [x] Fix any empty result issues (fixed Step 3 for categorical, Step 2 for correlation/survival)
+- [x] Add error handling for edge cases
