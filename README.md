@@ -1,8 +1,8 @@
-# ClinicalCompass 🧭
+# ResearchCompass 🧭
 
 > Your comprehensive research workflow assistant - from question to proposal
 
-ClinicalCompass is an AI-powered platform designed for academic and clinical researchers to plan, design, and write research proposals with guided step-by-step assistance.
+ResearchCompass is an AI-powered platform designed for academic and clinical researchers to plan, design, and write research proposals with guided step-by-step assistance.
 
 ## ✨ Features
 
@@ -38,7 +38,7 @@ ClinicalCompass is an AI-powered platform designed for academic and clinical res
 
 ```bash
 # Clone the repository
-cd clinical-compass
+cd research-compass
 
 # Install dependencies
 npm install
@@ -73,7 +73,7 @@ http://localhost:3001
 ## 🏗️ Project Structure
 
 ```
-clinical-compass/
+research-compass/
 ├── client/              # Frontend React application
 │   ├── src/
 │   │   ├── components/  # Reusable UI components
@@ -125,7 +125,7 @@ clinical-compass/
 
 ```env
 # Database
-DATABASE_URL=postgresql://user:password@localhost:5432/clinicalcompass
+DATABASE_URL=postgresql://user:password@localhost:5432/researchcompass
 
 # OpenAI (for AI features)
 OPENAI_API_KEY=your_openai_api_key
@@ -152,4 +152,4 @@ Built with modern web technologies and AI to accelerate clinical research.
 
 ---
 
-**ClinicalCompass** - Navigate your research journey with confidence 🧭
+**ResearchCompass** - Navigate your research journey with confidence 🧭

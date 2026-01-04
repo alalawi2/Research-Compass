@@ -85,7 +85,7 @@ export default function Home() {
         <div className="container flex h-16 items-center justify-between">
           <Link href="/">
             <a className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <h2 className="text-xl font-bold">ClinicalCompass</h2>
+              <h2 className="text-xl font-bold">ResearchCompass</h2>
             </a>
           </Link>
           
@@ -114,7 +114,7 @@ export default function Home() {
         <div className="container py-16 md:py-24">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              ClinicalCompass
+              ResearchCompass
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
               Your comprehensive platform for academic and clinical researchers to plan, design, and write research proposals with AI-powered assistance.
