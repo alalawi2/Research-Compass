@@ -17,10 +17,6 @@ export default function ProposalGeneratorPhase({
   const [generatedProposal, setGeneratedProposal] = useState("");
   const [generating, setGenerating] = useState(false);
 
-  useEffect(() => {
-    generateProposal();
-  }, []);
-
   const generateProposal = () => {
     setGenerating(true);
     
@@ -207,6 +203,12 @@ export default function ProposalGeneratorPhase({
     setGenerating(false);
   };
 
+  // Generate proposal when component mounts or workflowData changes
+  useEffect(() => {
+    generateProposal();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workflowData]);
+
   const handleDownload = () => {
     const blob = new Blob([generatedProposal], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -222,6 +224,13 @@ export default function ProposalGeneratorPhase({
   const handlePreview = () => {
     const previewWindow = window.open('', '_blank');
     if (previewWindow) {
+      // Escape HTML to prevent XSS
+      const escapeHtml = (text: string) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      };
+      
       previewWindow.document.write(`
         <html>
           <head>
@@ -237,7 +246,7 @@ export default function ProposalGeneratorPhase({
             </style>
           </head>
           <body>
-            <pre style="white-space: pre-wrap; font-family: Georgia, serif;">${generatedProposal}</pre>
+            <pre style="white-space: pre-wrap; font-family: Georgia, serif;">${escapeHtml(generatedProposal)}</pre>
           </body>
         </html>
       `);
