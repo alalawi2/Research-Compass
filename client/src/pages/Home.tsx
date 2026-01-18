@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { Loader2 } from "lucide-react";
+import { PageTransition, FadeIn, StaggerContainer } from "@/components/PageTransition";
+import { PageLoader } from "@/components/ui/loading";
 
 // Dashboard for authenticated users
 function Dashboard() {
@@ -59,34 +61,42 @@ function Dashboard() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto animate-fade-in">
-      {/* Welcome Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-1">
-          {getGreeting()}, {user?.name?.split(" ")[0] || "Researcher"}
-        </h1>
-        <p className="text-muted-foreground">
-          Here's what's happening with your research today.
-        </p>
-      </div>
+    <PageTransition>
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Welcome Header */}
+        <FadeIn>
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold mb-1">
+              {getGreeting()}, {user?.name?.split(" ")[0] || "Researcher"}
+            </h1>
+            <p className="text-muted-foreground">
+              Here's what's happening with your research today.
+            </p>
+          </div>
+        </FadeIn>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {quickActions.map((action) => (
-          <Link key={action.label} href={action.href}>
-            <a className="block">
-              <Card className="card-hover cursor-pointer h-full">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center`}>
-                    <action.icon className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="font-medium">{action.label}</span>
-                </CardContent>
-              </Card>
-            </a>
-          </Link>
-        ))}
-      </div>
+      <FadeIn delay={100}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {quickActions.map((action, index) => (
+            <Link key={action.label} href={action.href}>
+              <a
+                className="block animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <Card className="card-hover cursor-pointer h-full">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center`}>
+                      <action.icon className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="font-medium">{action.label}</span>
+                  </CardContent>
+                </Card>
+              </a>
+            </Link>
+          ))}
+        </div>
+      </FadeIn>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
@@ -148,9 +158,12 @@ function Dashboard() {
               </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {recentTools.map((tool) => (
+              {recentTools.map((tool, index) => (
                 <Link key={tool.label} href={tool.href}>
-                  <a className="block">
+                  <a
+                    className="block animate-in fade-in-0 zoom-in-95 duration-300"
+                    style={{ animationDelay: `${index * 75}ms` }}
+                  >
                     <Card className="card-hover cursor-pointer h-full">
                       <CardContent className="p-4">
                         <tool.icon className="h-8 w-8 text-primary mb-3" />
@@ -255,7 +268,8 @@ function Dashboard() {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </PageTransition>
   );
 }
 
@@ -489,11 +503,7 @@ export default function Home() {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader message="Loading your research dashboard..." />;
   }
 
   // Show dashboard for authenticated users, landing page for others
