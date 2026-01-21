@@ -245,3 +245,94 @@ export const projectActivities = mysqlTable("project_activities", {
 
 export type ProjectActivity = typeof projectActivities.$inferSelect;
 export type InsertProjectActivity = typeof projectActivities.$inferInsert;
+
+/**
+ * On-Call Teams table - stores research teams for on-call rotation
+ */
+export const oncallTeams = mysqlTable("oncall_teams", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  createdBy: int("created_by").notNull(),
+  rotationType: mysqlEnum("rotation_type", ["daily", "weekly", "biweekly", "monthly"]).default("weekly").notNull(),
+  startDate: timestamp("start_date"),
+  timezone: varchar("timezone", { length: 100 }).default("UTC").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type OncallTeam = typeof oncallTeams.$inferSelect;
+export type InsertOncallTeam = typeof oncallTeams.$inferInsert;
+
+/**
+ * On-Call Team Members table - stores team membership
+ */
+export const oncallMembers = mysqlTable("oncall_members", {
+  id: int("id").autoincrement().primaryKey(),
+  teamId: int("team_id").notNull(),
+  userId: int("user_id").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 50 }),
+  role: mysqlEnum("role", ["admin", "member"]).default("member").notNull(),
+  order: int("order").default(0).notNull(), // Order in rotation
+  isActive: mysqlEnum("is_active", ["yes", "no"]).default("yes").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type OncallMember = typeof oncallMembers.$inferSelect;
+export type InsertOncallMember = typeof oncallMembers.$inferInsert;
+
+/**
+ * On-Call Shifts table - stores individual shift assignments
+ */
+export const oncallShifts = mysqlTable("oncall_shifts", {
+  id: int("id").autoincrement().primaryKey(),
+  teamId: int("team_id").notNull(),
+  memberId: int("member_id").notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  shiftType: mysqlEnum("shift_type", ["primary", "secondary", "backup"]).default("primary").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type OncallShift = typeof oncallShifts.$inferSelect;
+export type InsertOncallShift = typeof oncallShifts.$inferInsert;
+
+/**
+ * On-Call Swap Requests table - stores requests to swap shifts
+ */
+export const oncallSwapRequests = mysqlTable("oncall_swap_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  shiftId: int("shift_id").notNull(),
+  requesterId: int("requester_id").notNull(), // Member requesting the swap
+  targetMemberId: int("target_member_id"), // Member being asked to swap (null = open request)
+  status: mysqlEnum("status", ["pending", "accepted", "rejected", "cancelled"]).default("pending").notNull(),
+  reason: text("reason"),
+  respondedAt: timestamp("responded_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OncallSwapRequest = typeof oncallSwapRequests.$inferSelect;
+export type InsertOncallSwapRequest = typeof oncallSwapRequests.$inferInsert;
+
+/**
+ * On-Call Overrides table - stores temporary overrides to the rotation
+ */
+export const oncallOverrides = mysqlTable("oncall_overrides", {
+  id: int("id").autoincrement().primaryKey(),
+  teamId: int("team_id").notNull(),
+  originalMemberId: int("original_member_id").notNull(),
+  overrideMemberId: int("override_member_id").notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  reason: text("reason"),
+  createdBy: int("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OncallOverride = typeof oncallOverrides.$inferSelect;
+export type InsertOncallOverride = typeof oncallOverrides.$inferInsert;
